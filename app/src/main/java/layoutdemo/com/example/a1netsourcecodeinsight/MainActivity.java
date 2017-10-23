@@ -1,6 +1,9 @@
 package layoutdemo.com.example.a1netsourcecodeinsight;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -35,7 +38,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         bt_searchURL.setOnClickListener(this);
         System.out.println("onCreate:"+Thread.currentThread().toString());
 
+
+
     }
+
+    //☆☆☆1.在主线程中：增加handler
+    Handler handler = new Handler(){
+        //☆☆☆2.接收msg信息，并处理
+        @Override
+        public void handleMessage(Message msg) {
+            tv_performCode.setText((String)msg.obj);
+        }
+    };
 
     @Override
     public void onClick(View view) {
@@ -67,7 +81,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             //5.获取有效的数据，并将数据解析成为String
                             InputStream stream = connection.getInputStream();
                             String result = StreamUtil.streamToString(stream);
-                            tv_performCode.setText(result);
+                            //☆☆☆3.将线程的消息封装，封转之后发送；
+                            Message message = new Message();
+                            message.obj = result;
+                            handler.sendMessage(message);
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
